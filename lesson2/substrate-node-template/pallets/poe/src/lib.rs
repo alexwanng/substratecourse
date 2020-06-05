@@ -7,6 +7,7 @@ use frame_support::{decl_module, decl_storage, decl_event, decl_error, dispatch,
 use frame_system::{self as system, ensure_signed};
 use sp_std::prelude::*;
 
+
 #[cfg(test)]
 mod mock;
 
@@ -39,6 +40,7 @@ decl_event!(
 	pub enum Event<T> where AccountId = <T as system::Trait>::AccountId {
 		ClaimCreated(AccountId, Vec<u8>),
 		ClaimRevoked(AccountId, Vec<u8>),
+		ClaimTransfered(AccountId, Vec<u8>),
 	}
 );
 
@@ -75,13 +77,33 @@ decl_module! {
 		   Ok(())
 		}
 
+
+
+		#[weight = 0]
+		pub fn transfer_claim(origin, claim: Vec<u8>, receiver: T::AccountId) -> dispatch::DispatchResult {
+			let sender = ensure_signed(origin)?;
+
+
+		    ensure!(Proofs::<T>::contains_key(&claim), Error::<T>::ClaimNotExist);
+
+		    let (owner, _block_number) = Proofs::<T>::get(&claim);
+            ensure!(owner == sender, Error::<T>::NotClaimOwner);
+
+            Proofs::<T>::remove(&claim);
+
+            Proofs::<T>::insert(&claim, (receiver.clone(), system::Module::<T>::block_number()));
+
+            Self::deposit_event(RawEvent::ClaimTransfered(sender, claim));
+            Ok(())
+		}
+
         #[weight = 0]
 		pub fn revoke_claim(origin, claim: Vec<u8>) -> dispatch::DispatchResult {
 			let sender = ensure_signed(origin)?;
 
-		    ensure!(!Proofs::<T>::contains_key(&claim), Error::<T>::ClaimNotExist);
+		    ensure!(Proofs::<T>::contains_key(&claim), Error::<T>::ClaimNotExist);
 
-		    let (owner, block_number) = Proofs::<T>::get(&claim);
+		    let (owner, _block_number) = Proofs::<T>::get(&claim);
             ensure!(owner == sender, Error::<T>::NotClaimOwner);
 
             Proofs::<T>::remove(&claim);
@@ -90,10 +112,9 @@ decl_module! {
             Ok(())
 		}
 
-
-
-
 	}
 
 
+
 }
+
