@@ -50,6 +50,7 @@ decl_error! {
 		ProofAlreadyExist,
 		ClaimNotExist,
 		NotClaimOwner,
+		ProofTooLong,
 	}
 }
 
@@ -71,6 +72,10 @@ decl_module! {
 		   let sender = ensure_signed(origin)?;
 
 		   ensure!(!Proofs::<T>::contains_key(&claim), Error::<T>::ProofAlreadyExist);
+
+		   //增加为存证内容的哈希值设置界限，如果超出界限，返回错误
+		   ensure!(&claim.len() < &10, Error::<T>::ProofTooLong);
+
 		   Proofs::<T>::insert(&claim, (sender.clone(), system::Module::<T>::block_number()));
 
 		   Self::deposit_event(RawEvent::ClaimCreated(sender, claim));
