@@ -6,6 +6,7 @@ use frame_support::{impl_outer_origin, parameter_types, weights::Weight};
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup}, testing::Header, Perbill,
 };
+
 use frame_system as system;
 
 impl_outer_origin! {
@@ -57,6 +58,7 @@ impl Trait for Test {
 	type MaxClaimLength = MaxClaimLength;
 }
 pub type PoeModule = Module<Test>;
+
 
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
