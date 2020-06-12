@@ -110,7 +110,7 @@ decl_module! {
 
 			let (owner, _block_number) = Proofs::<T>::get(&claim);
 
-			ensure!(owner == sender, Error::<T>::NotClaimOwner);
+			ensure!(owner == sender, Error::	T>::NotClaimOwner);
 
 			let dest = T::Lookup::lookup(dest)?;
 

@@ -14,6 +14,7 @@ function Main (props) {
   const [digest, setDigest] = useState('');
   const [owner, setOwner] = useState('');
   const [blockNumber, setBlockNumber] = useState(0);
+  const [dest, setDest] = useState('');
 
   useEffect(() => {
     let unsubscribe;
@@ -43,6 +44,10 @@ function Main (props) {
     fileReader.onload = bufferToDigest;
 
     fileReader.readAsArrayBuffer(file);
+  };
+
+  const onDestChange = (_, data) => {
+      setDest(data.value);
   }
 
   return (
@@ -51,6 +56,7 @@ function Main (props) {
       <Form>
         <Form.Field>
           <Input type='file' id='file' label='Your File' onChange={(e) => handleFileChosen(e.target.files[0])} />
+          <Input type='text' id='dest' laber='Receiver' state='dest' onChange={onDestChange}/>
         </Form.Field>
         <Form.Field>
           <TxButton
@@ -61,7 +67,7 @@ function Main (props) {
               attrs={{
                   palletRpc: 'poeModule',
                   callable: 'createClaim',
-                  inputParams: [digest],
+                  inputParams: [digest, dest],
                   paramFields: [true]
 
               }}
@@ -79,6 +85,19 @@ function Main (props) {
 
               }}
           />
+            <TxButton
+                accountPair={accountPair}
+                label='Transfer Claim'
+                setStatus={setStatus}
+                type='SIGNED-TX'
+                attrs={{
+                    palletRpc: 'poeModule',
+                    callable: 'transferClaim',
+                    inputParams: [digest, dest],
+                    paramFields: [true]
+
+                }}
+            />
         </Form.Field>
         <div>{status}</div>
         <div>{`Claim info, owner: ${owner}, blockNumber: ${blockNumber}`}</div>
