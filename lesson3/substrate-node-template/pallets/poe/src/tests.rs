@@ -86,4 +86,23 @@ fn transfer_claim_works(){
     })
 }
 
+#[test]
+fn transfer_claim_failed_when_not_exists() {
+    new_test_ext().execute_with(|| {
+        let claim = vec![0, 1];
+        assert_noop!(PoeModule::transfer_claim(Origin::signed(1), claim.clone(), 2), Error::<Test>::ClaimNotExist);
+
+    })
+}
+
+#[test]
+fn transfer_claim_failed_when_not_owner() {
+    new_test_ext().execute_with(|| {
+        let claim = vec![0, 1];
+        let _ = PoeModule::create_claim(Origin::signed(1), claim.clone());
+        assert_noop!(PoeModule::transfer_claim(Origin::signed(2), claim.clone(), 3), Error::<Test>::NotClaimOwner);
+
+    })
+}
+
 //when above tests completed, run all tests with command `cargo test`
