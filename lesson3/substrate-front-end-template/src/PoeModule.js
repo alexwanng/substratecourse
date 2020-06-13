@@ -67,7 +67,7 @@ function Main (props) {
               attrs={{
                   palletRpc: 'poeModule',
                   callable: 'createClaim',
-                  inputParams: [digest, dest],
+                  inputParams: [digest],
                   paramFields: [true]
 
               }}
