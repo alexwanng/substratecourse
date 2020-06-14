@@ -8,9 +8,13 @@ use super::*;
 #[test]
 fn create_claim_works() {
 
+    // 测试中使用mock中声明的new_test_ext
     new_test_ext().execute_with(|| {
         let claim = vec![0, 1];
+        // 执行成功的操作， 使用 assert_ok!
         assert_ok!(PoeModule::create_claim(Origin::signed(1), claim.clone()));
+
+        // 逻辑相等操作， 使用 assert_eq!
         assert_eq!(Proofs::<Test>::get(&claim), (1, system::Module::<Test>::block_number()));
     })
 }
@@ -23,6 +27,7 @@ fn create_claim_failed_when_claim_already_exists() {
         let claim = vec![0, 1];
         let _ = PoeModule::create_claim(Origin::signed(1), claim.clone());
 
+        // 预期返回一个指定的错误， 使用 assert_noop!
         assert_noop!(
             PoeModule::create_claim(Origin::signed(1), claim.clone()),
             Error::<Test>::ProofAlreadyExist

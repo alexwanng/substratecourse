@@ -31,6 +31,7 @@ impl system::Trait for Test {
 	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
+	// 注意这两个声明 AccountId 和 Lookup
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -49,12 +50,13 @@ impl system::Trait for Test {
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 }
-
+// 测试需要用到的常量声明
 parameter_types! {
 	pub const MaxClaimLength: u32 = 6;
 }
 impl Trait for Test {
 	type Event = ();
+	// 测试需要用到的常量声明
 	type MaxClaimLength = MaxClaimLength;
 }
 pub type PoeModule = Module<Test>;
@@ -62,6 +64,7 @@ pub type PoeModule = Module<Test>;
 
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
+// test 里用到的基本函数库， 公用
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }
