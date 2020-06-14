@@ -5,6 +5,9 @@ import { useSubstrate } from './substrate-lib';
 import { TxButton } from './substrate-lib/components';
 import {blake2AsHex} from "@polkadot/util-crypto";
 
+
+//copy from TemplateModule.js
+
 function Main (props) {
   const { api } = useSubstrate();
   const { accountPair } = props;
@@ -29,6 +32,7 @@ function Main (props) {
     return () => unsubscribe && unsubscribe();
   }, [digest, api.query.poeModule]);
 
+  // 选择文件事件处理，  将文件内容做哈希处理， setDigest(hash)
   const handleFileChosen = (file) => {
     let fileReader = new FileReader();
 
@@ -46,6 +50,7 @@ function Main (props) {
     fileReader.readAsArrayBuffer(file);
   };
 
+  // claim 转移的接收人事件处理， setDest(data.value)
   const onDestChange = (_, data) => {
       setDest(data.value);
   }
@@ -55,17 +60,21 @@ function Main (props) {
       <h1>Proof of Existence Module</h1>
       <Form>
         <Form.Field>
+            //File Field
           <Input type='file' id='file' label='Your File' onChange={(e) => handleFileChosen(e.target.files[0])} />
+          // 接收人 Field
           <Input type='text' id='dest' laber='Receiver' state='dest' onChange={onDestChange}/>
         </Form.Field>
         <Form.Field>
           <TxButton
+              // 使用 accountPair
               accountPair={accountPair}
               label='Create Claim'
               setStatus={setStatus}
               type='SIGNED-TX'
               attrs={{
                   palletRpc: 'poeModule',
+                  // 事件触发的回调函数 : createClaim
                   callable: 'createClaim',
                   inputParams: [digest],
                   paramFields: [true]
@@ -93,6 +102,7 @@ function Main (props) {
                 attrs={{
                     palletRpc: 'poeModule',
                     callable: 'transferClaim',
+                    // transferClaim 触发调用的函数多一个dest
                     inputParams: [digest, dest],
                     paramFields: [true]
 
@@ -109,6 +119,7 @@ function Main (props) {
 
 export default function PoeModule (props) {
   const { api } = useSubstrate();
+  // export function for poeModule
   return (api.query.poeModule && api.query.poeModule.proofs
     ? <Main {...props} /> : null);
 }

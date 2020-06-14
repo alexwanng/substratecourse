@@ -15,6 +15,7 @@ import NodeInfo from './NodeInfo';
 import TemplateModule from './TemplateModule';
 import Transfer from './Transfer';
 import Upgrade from './Upgrade';
+// 引入PoeModule
 import PoeModule from './PoeModule';
 
 function Main () {
@@ -69,6 +70,7 @@ function Main () {
           <Grid.Row>
             <TemplateModule accountPair={accountPair} />
           </Grid.Row>
+          // 为PoeModule 引入 accountPair
           <Grid.Row>
             <PoeModule accountPair={accountPair} />
           </Grid.Row>
