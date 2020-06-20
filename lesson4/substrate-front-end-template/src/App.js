@@ -70,7 +70,6 @@ function Main () {
           <Grid.Row>
             <TemplateModule accountPair={accountPair} />
           </Grid.Row>
-          // 为PoeModule 引入 accountPair
           <Grid.Row>
             <PoeModule accountPair={accountPair} />
           </Grid.Row>

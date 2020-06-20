@@ -34,6 +34,7 @@ decl_storage! {
 	// ---------------------------------vvvvvvvvvvvvvv
 	trait Store for Module<T: Trait> as TemplateModule {
 		Proofs get(fn proofs): map hasher(blake2_128_concat) Vec<u8> => (T::AccountId, T::BlockNumber);
+		ProofsWithTimestampNotes get(fn proofs_timestamp_notes): map hasher(blake2_128_concat) Vec<u8> => (T::AccountId, u64, Vec<u8>);
 	}
 }
 
@@ -78,6 +79,7 @@ decl_module! {
 			// 附加题答案
 			ensure!(T::MaxClaimLength::get() >= claim.len() as u32, Error::<T>::ProofTooLong);
 
+
 			Proofs::<T>::insert(&claim, (sender.clone(), system::Module::<T>::block_number()));
 
 			Self::deposit_event(RawEvent::ClaimCreated(sender, claim));
@@ -104,7 +106,7 @@ decl_module! {
 
 		// 第二题答案
 		#[weight = 0]
-		pub fn transfer_claim(origin, claim: Vec<u8>, dest: <T::Lookup as StaticLookup>::Source) -> dispatch::DispatchResult {
+		pub fn transfer_claim(origin, claim: Vec<u8>, dest: <T::Lookup as StaticLookup>::Source, _timestamp: u64, comments: Vec<u8>) -> dispatch::DispatchResult {
 			let sender = ensure_signed(origin)?;
 
 			ensure!(Proofs::<T>::contains_key(&claim), Error::<T>::ClaimNotExist);
@@ -116,6 +118,10 @@ decl_module! {
 			let dest = T::Lookup::lookup(dest)?;
 
 			Proofs::<T>::insert(&claim, (dest.clone(), system::Module::<T>::block_number()));
+
+			// 转移claim新增参数 timestamp和comments, timestamp对数据类型不熟悉, 暂时用u64类型代替,
+			// comments不知道怎么用字符表示, 暂时用Vec<u8> 表示
+			ProofsWithTimestampNotes::<T>::insert(&claim, (dest.clone(), _timestamp, comments));
 
 			Self::deposit_event(RawEvent::ClaimTransfered(sender, claim, dest.clone()));
 
